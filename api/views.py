@@ -62,6 +62,13 @@ def searchMovies(request):
     # Get query from request
     query = request.GET.get("query")
 
+    # Return error if query parameter is missing
+    if query is None:
+        return Response(
+            {"error": "Missing query parameter."},
+            status=400,
+        )
+
     # Search for movie titles that match query
     movies = Movie.objects.filter(title__icontains=query)
 
