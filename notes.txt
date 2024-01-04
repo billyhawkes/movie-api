@@ -1,0 +1,8 @@
+Dataset of max 10,000 records
+6 interesting endpoints
+- At least one POST
+- SQLite3 database
+
+Use serialization
+Unit test
+Load and store python script to load data from CSV to db
