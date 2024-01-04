@@ -4,10 +4,10 @@ import os
 import django
 import pandas as pd
 
-from base.models import Genre, Movie
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "admin.settings")
 django.setup()
+
+from base.models import Genre, Movie  # noqa: E402
 
 
 def populate_genres(genre_df):
