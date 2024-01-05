@@ -1,3 +1,4 @@
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -6,6 +7,7 @@ from base.models import Genre, Movie
 from .serializers import GenreSerializer, MovieSerializer
 
 
+@extend_schema(responses={200: GenreSerializer(many=True)}, description="Get genres")
 @api_view(["GET"])
 def getGenres(request):
     # Get all genres
@@ -16,6 +18,27 @@ def getGenres(request):
     return Response(serializer.data)
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="genre", description="Genre name", required=False, type=str
+        ),
+        OpenApiParameter(
+            name="sort", description="Sort parameter", required=False, type=str
+        ),
+    ],
+    examples=[
+        OpenApiExample(
+            "Top rated action movies",
+            value={
+                "genre": "Action",
+                "sort": "-popularity",
+            },
+        ),
+    ],
+    responses={200: MovieSerializer(many=True)},
+    description="Get movies",
+)
 @api_view(["GET"])
 def getMovies(request):
     # Get genre and sort parameters from request
@@ -57,6 +80,23 @@ def getMovies(request):
     return Response(serializer.data)
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="query", description="Search query", required=True, type=str
+        )
+    ],
+    examples=[
+        OpenApiExample(
+            "Search for Titanic",
+            value={
+                "query": "Titanic",
+            },
+        ),
+    ],
+    responses={200: MovieSerializer(many=True)},
+    description="Search movies",
+)
 @api_view(["GET"])
 def searchMovies(request):
     # Get query from request
@@ -77,6 +117,21 @@ def searchMovies(request):
     return Response(serializer.data)
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(name="id", description="Movie ID", required=True, type=str)
+    ],
+    examples=[
+        OpenApiExample(
+            "Get Titanic",
+            value={
+                "id": "597",
+            },
+        ),
+    ],
+    responses={200: MovieSerializer()},
+    description="Get movie by ID",
+)
 @api_view(["GET"])
 def getMovie(request, id):
     # Get movie by id
@@ -87,6 +142,21 @@ def getMovie(request, id):
     return Response(serializer.data)
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(name="genres", description="Genres", required=True, type=str)
+    ],
+    examples=[
+        OpenApiExample(
+            "Get recommendations for action and adventure movies",
+            value={
+                "genres": "Action,Adventure",
+            },
+        ),
+    ],
+    responses={200: MovieSerializer(many=True)},
+    description="Get recommendations",
+)
 @api_view(["GET"])
 def getRecommendations(request):
     # Get genres parameter from request
@@ -110,6 +180,34 @@ def getRecommendations(request):
     return Response(serializer.data)
 
 
+@extend_schema(
+    request=MovieSerializer,
+    responses={201: MovieSerializer()},
+    description="Add movie",
+    examples=[
+        OpenApiExample(
+            "Add Titanic",
+            value={
+                "budget": 200000000,
+                "genres": [
+                    {
+                        "id": 18,
+                        "name": "Drama",
+                    },
+                    {
+                        "id": 10749,
+                        "name": "Romance",
+                    },
+                ],
+                "homepage": "http://www.titanicmovie.com/",
+                "id": 597,
+                "overview": "101-year-old Rose DeWitt Bukater tells the story of her life aboard the Titanic, 84 years later. A young Rose boards the ship with her mother and fiancé. Meanwhile, Jack Dawson and Fabrizio De Rossi win third-class tickets aboard the ship. Rose tells the whole story from Titanic's departure through to its death—on its first and last voyage—on April 15, 1912.",
+                "popularity": 38.116,
+                "title": "Titanic",
+            },
+        ),
+    ],
+)
 @api_view(["POST"])
 def addMovie(request):
     # Create movie from request data

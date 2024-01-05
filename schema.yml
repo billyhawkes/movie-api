@@ -6,7 +6,8 @@ info:
 paths:
   /api/genres/:
     get:
-      operationId: genres_retrieve
+      operationId: genres_list
+      description: Get genres
       tags:
       - genres
       security:
@@ -15,10 +16,28 @@ paths:
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Genre'
+          description: ''
   /api/movies/:
     get:
-      operationId: movies_retrieve
+      operationId: movies_list
+      description: Get movies
+      parameters:
+      - in: query
+        name: genre
+        schema:
+          type: string
+        description: Genre name
+      - in: query
+        name: sort
+        schema:
+          type: string
+        description: Sort parameter
       tags:
       - movies
       security:
@@ -27,15 +46,34 @@ paths:
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+              examples:
+                TopRatedActionMovies:
+                  value:
+                  - genre: Action
+                    sort: -popularity
+                  summary: Top rated action movies
+          description: ''
   /api/movies/{id}/:
     get:
-      operationId: movies_retrieve_2
+      operationId: movies_retrieve
+      description: Get movie by ID
       parameters:
       - in: path
         name: id
         schema:
           type: integer
+        required: true
+      - in: query
+        name: id
+        schema:
+          type: string
+        description: Movie ID
         required: true
       tags:
       - movies
@@ -45,22 +83,96 @@ paths:
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+              examples:
+                GetTitanic:
+                  value:
+                    id: '597'
+                  summary: Get Titanic
+          description: ''
   /api/movies/add/:
     post:
       operationId: movies_add_create
+      description: Add movie
       tags:
       - movies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Movie'
+            examples:
+              AddTitanic:
+                value:
+                  budget: 200000000
+                  genres:
+                  - id: 18
+                    name: Drama
+                  - id: 10749
+                    name: Romance
+                  homepage: http://www.titanicmovie.com/
+                  id: 597
+                  overview: 101-year-old Rose DeWitt Bukater tells the story of her
+                    life aboard the Titanic, 84 years later. A young Rose boards the
+                    ship with her mother and fiancé. Meanwhile, Jack Dawson and Fabrizio
+                    De Rossi win third-class tickets aboard the ship. Rose tells the
+                    whole story from Titanic's departure through to its death—on its
+                    first and last voyage—on April 15, 1912.
+                  popularity: 38.116
+                  title: Titanic
+                summary: Add Titanic
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Movie'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Movie'
+        required: true
       security:
       - cookieAuth: []
       - basicAuth: []
       - {}
       responses:
-        '200':
-          description: No response body
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+              examples:
+                AddTitanic:
+                  value:
+                    budget: 200000000
+                    genres:
+                    - id: 18
+                      name: Drama
+                    - id: 10749
+                      name: Romance
+                    homepage: http://www.titanicmovie.com/
+                    id: 597
+                    overview: 101-year-old Rose DeWitt Bukater tells the story of
+                      her life aboard the Titanic, 84 years later. A young Rose boards
+                      the ship with her mother and fiancé. Meanwhile, Jack Dawson
+                      and Fabrizio De Rossi win third-class tickets aboard the ship.
+                      Rose tells the whole story from Titanic's departure through
+                      to its death—on its first and last voyage—on April 15, 1912.
+                    popularity: 38.116
+                    title: Titanic
+                  summary: Add Titanic
+          description: ''
   /api/movies/recommendations/:
     get:
-      operationId: movies_recommendations_retrieve
+      operationId: movies_recommendations_list
+      description: Get recommendations
+      parameters:
+      - in: query
+        name: genres
+        schema:
+          type: string
+        description: Genres
+        required: true
       tags:
       - movies
       security:
@@ -69,10 +181,29 @@ paths:
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+              examples:
+                GetRecommendationsForActionAndAdventureMovies:
+                  value:
+                  - genres: Action,Adventure
+                  summary: Get recommendations for action and adventure movies
+          description: ''
   /api/movies/search/:
     get:
-      operationId: movies_search_retrieve
+      operationId: movies_search_list
+      description: Search movies
+      parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        description: Search query
+        required: true
       tags:
       - movies
       security:
@@ -81,8 +212,61 @@ paths:
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+              examples:
+                SearchForTitanic:
+                  value:
+                  - query: Titanic
+                  summary: Search for Titanic
+          description: ''
 components:
+  schemas:
+    Genre:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          maxLength: 50
+      required:
+      - id
+      - name
+    Movie:
+      type: object
+      properties:
+        id:
+          type: integer
+        budget:
+          type: integer
+        homepage:
+          type: string
+          maxLength: 200
+        title:
+          type: string
+          maxLength: 200
+        overview:
+          type: string
+        popularity:
+          type: number
+          format: double
+        genres:
+          type: array
+          items:
+            type: integer
+      required:
+      - budget
+      - genres
+      - homepage
+      - id
+      - overview
+      - popularity
+      - title
   securitySchemes:
     basicAuth:
       type: http
