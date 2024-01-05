@@ -118,9 +118,6 @@ def searchMovies(request):
 
 
 @extend_schema(
-    parameters=[
-        OpenApiParameter(name="id", description="Movie ID", required=True, type=str)
-    ],
     examples=[
         OpenApiExample(
             "Get Titanic",

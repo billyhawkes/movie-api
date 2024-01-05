@@ -69,12 +69,6 @@ paths:
         schema:
           type: integer
         required: true
-      - in: query
-        name: id
-        schema:
-          type: string
-        description: Movie ID
-        required: true
       tags:
       - movies
       security:
